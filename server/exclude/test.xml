@@ -1,0 +1,8 @@
+<digger>
+	<temperatures>
+		<card id="1">45</card>
+		<card id="2">50</card>
+	</temperatures>
+	<uptime>2 days</uptime>
+	<ip-address>10.94.141.25</ip-address>
+</digger>
