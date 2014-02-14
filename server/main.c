@@ -23,32 +23,40 @@
 #include "connection.h"
 #include "logger.h"
 #include "reader.h"
+#include "main.h"
 
 #define SERVER_ADDR "127.0.0.1"
+#define XML_FILE "../../xml/xml_file.xml"
 
-
-void Main__PrintValues(XMLStruct *values);
 int main(int argc, char* argv[]){
-	/*XMLStruct *values = Reader__ReadFile ("exclude/test.xml");
-	if(values){
-		Main__PrintValues(values);
-		return (0);
-	} else {
-		return (-1);
-	}*/
+	pthread_t connection, reader;
 
-	Connection__Connect (SERVER_ADDR, 2000);
-	return 0;
-}
-
-void Main__PrintValues(XMLStruct *values){
-	printf("Machine IP:%s\n", values->ip_address);
-	printf("Uptime: %d\n", values->uptime);
-	int i;
-	printf("Cards temps:\n");
-	for(i = 0; i < CARDS_MAX; i++){
-		if(values->temperatures[i] > 0){
-			printf ("\t%d:%d\n", i, values->temperatures[i]);
-		}
+	XMLStruct xml_data;
+	int valid_data = 0;
+	
+	ConnectionData connection_data;	
+	connection_data.ip_address = SERVER_ADDR;
+	connection_data.port = 2000;
+	connection_data.xml_data = &xml_data;
+	connection_data.valid_data = &valid_data;
+	
+	if(pthread_create(&connection, NULL, Connection__Connect, &connection_data) < 0){
+		DBG__LOG("Cannot create Connection Hypervisor thread\n");
+		return -1;
 	}
+
+	ReaderData reader_data;
+	reader_data.xml_file = XML_FILE;
+	reader_data.xml_data = &xml_data;
+	reader_data.valid_data = &valid_data;
+	if(pthread_create(&reader, NULL, Reader__ReadFile, (void *) &reader_data) < 0){
+		DBG__LOG("Cannot create Reader thread\n");
+		return -1;
+	}
+	
+
+	pthread_join(connection, NULL);
+	pthread_join(reader, NULL);
+	
+	return 0;
 }

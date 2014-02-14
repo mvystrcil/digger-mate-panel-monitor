@@ -29,11 +29,18 @@
 #include <sys/ioctl.h>
 
 #include "logger.h"
+#include "reader.h"
+#include "connection.h"
+#include "main.h"
 
 void Connection__HandleConnections(struct sockaddr_in server_data, int server_fd);
-void *Connection__ConnectionHandler(void *client_fd);
+void* Connection__ConnectionHandler(void *client_fd);
+ConnectionData *data;
 
-void Connection__Connect(const char *address, int port){
+void Connection__Connect(void *conn_data){
+	data = (ConnectionData *) conn_data;
+	char *address = data->ip_address;
+	int port = data->port;
 	int server_fd, res;
 	struct sockaddr_in server_data;
 	
@@ -68,10 +75,6 @@ void Connection__Connect(const char *address, int port){
 	return;
 }
 
-void Connection__SendData(){
-	
-}
-
 void Connection__HandleConnections(struct sockaddr_in server_data, int server_fd){
 	int client_fd;
 	int *new_sock;
@@ -96,10 +99,12 @@ void Connection__HandleConnections(struct sockaddr_in server_data, int server_fd
 	}
 }
 
-void * Connection__ConnectionHandler(void *client_fd){
+void* Connection__ConnectionHandler(void *client_fd){
 	printf ("Client accepted\n");
 	char *message = "Hello from digger server\n";
 	write(*(int*) client_fd, message, sizeof(message));
+
+	printf("Valid data ?: %d\n", data->valid_data);
 
 	message = "Hello from digger server\n";
 	write(*(int*) client_fd, message, sizeof(message));

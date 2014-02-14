@@ -17,5 +17,5 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-void Connection__Connect(const char *address, int port);
+void Connection__Connect(void *conn_data);
 

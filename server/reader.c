@@ -25,13 +25,17 @@
 
 #include "reader.h"
 #include "logger.h"
+#include "main.h"
 
 xmlNode* Reader__ParseXMLFile(const char *xmlFile);
 void Reader__FillXMLStruct(xmlNode *root, XMLStruct *values);
 int Reader__KeyFromString(char *key);
 void Reader__FillTemperatures(xmlNode *node, XMLStruct *values);
+XMLStruct values;
 
-XMLStruct* Reader__ReadFile(const char *file){
+XMLStruct* Reader__ReadFile(void *in_file){
+	ReaderData *data = (ReaderData *)in_file;
+	const char *file = data->xml_file;
 	DBG__LOG("Reading file with fd: %s\n", file);
 
 	LIBXML_TEST_VERSION
@@ -39,6 +43,7 @@ XMLStruct* Reader__ReadFile(const char *file){
 	xmlNode *root = Reader__ParseXMLFile(file);
 	if(root){
 		Reader__FillXMLStruct (root, &values);
+		data->valid_data = 1;
 		return &values;
 	}else{
 		return NULL;
