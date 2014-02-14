@@ -1,4 +1,4 @@
-LIBS = $(shell pkg-config --libs libxml-2.0)
+LIBS = $(shell pkg-config --libs libxml-2.0) -lpthread
 CC = gcc
 CFLAGS = -g -Wall
 TARGET = digger-client

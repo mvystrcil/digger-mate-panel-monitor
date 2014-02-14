@@ -24,10 +24,12 @@
 #include "logger.h"
 #include "reader.h"
 
+#define SERVER_ADDR "127.0.0.1"
+
 
 void Main__PrintValues(XMLStruct *values);
 int main(int argc, char* argv[]){
-	/*XMLStruct *values = Reader__ReadFile ("/home/mint/Digger-project/exclude/test.xml");
+	/*XMLStruct *values = Reader__ReadFile ("exclude/test.xml");
 	if(values){
 		Main__PrintValues(values);
 		return (0);
@@ -35,7 +37,8 @@ int main(int argc, char* argv[]){
 		return (-1);
 	}*/
 
-	Connection__Connect ("www.google.com", 20);
+	Connection__Connect (SERVER_ADDR, 2000);
+	return 0;
 }
 
 void Main__PrintValues(XMLStruct *values){
