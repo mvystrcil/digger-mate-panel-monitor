@@ -40,4 +40,4 @@ typedef struct {
 	char *ip_address;
 }XMLStruct;
 
-XMLStruct* Reader__ReadFile(void *file);
+void Reader__ReadFile(void *file);

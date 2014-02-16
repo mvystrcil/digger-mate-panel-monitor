@@ -19,6 +19,7 @@
 
 #include <stdio.h>
 #include <pthread.h>
+#include <string.h>
 
 #include "connection.h"
 #include "logger.h"
@@ -28,11 +29,12 @@
 #define SERVER_ADDR "127.0.0.1"
 #define XML_FILE "../../xml/xml_file.xml"
 
+XMLStruct xml_data;
+int valid_data = 0;
+
 int main(int argc, char* argv[]){
 	pthread_t connection, reader;
-
-	XMLStruct xml_data;
-	int valid_data = 0;
+	bzero(&xml_data, sizeof(xml_data));
 	
 	ConnectionData connection_data;	
 	connection_data.ip_address = SERVER_ADDR;
@@ -49,11 +51,11 @@ int main(int argc, char* argv[]){
 	reader_data.xml_file = XML_FILE;
 	reader_data.xml_data = &xml_data;
 	reader_data.valid_data = &valid_data;
+	
 	if(pthread_create(&reader, NULL, Reader__ReadFile, (void *) &reader_data) < 0){
 		DBG__LOG("Cannot create Reader thread\n");
 		return -1;
 	}
-	
 
 	pthread_join(connection, NULL);
 	pthread_join(reader, NULL);

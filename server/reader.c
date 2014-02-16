@@ -31,22 +31,26 @@ xmlNode* Reader__ParseXMLFile(const char *xmlFile);
 void Reader__FillXMLStruct(xmlNode *root, XMLStruct *values);
 int Reader__KeyFromString(char *key);
 void Reader__FillTemperatures(xmlNode *node, XMLStruct *values);
+void Reader__DumpData(XMLStruct *values);
 XMLStruct values;
 
-XMLStruct* Reader__ReadFile(void *in_file){
+void Reader__ReadFile(void *in_file){
 	ReaderData *data = (ReaderData *)in_file;
 	const char *file = data->xml_file;
 	DBG__LOG("Reading file with fd: %s\n", file);
 
 	LIBXML_TEST_VERSION
 
-	xmlNode *root = Reader__ParseXMLFile(file);
-	if(root){
-		Reader__FillXMLStruct (root, &values);
-		data->valid_data = 1;
-		return &values;
-	}else{
-		return NULL;
+	while(TRUE){
+		xmlNode *root = Reader__ParseXMLFile(file);
+		if(root){
+			Reader__FillXMLStruct (root, data->xml_data);
+			*(data->valid_data) = TRUE;
+		} else {
+			*(data->valid_data) = FALSE;
+		}
+
+		sleep(100);
 	}
 }
 
@@ -63,22 +67,21 @@ xmlNode* Reader__ParseXMLFile(const char *xmlFile){
 
 void Reader__FillXMLStruct(xmlNode *root, XMLStruct *values){
 	DBG__LOG("Fill xml struct for root: %s\n", root->name);
-	printf ("Values pointer: %p\n", values);
 	xmlNode *tmp_node = root->children;	
 
 	while(tmp_node){
 		if(tmp_node->type == XML_ELEMENT_NODE){
 			switch(Reader__KeyFromString((char *) tmp_node->name)){
 				case TEMPERATURES:
-					DBG__LOG("Found temperatures block: %s\n", root->name);
+					DBG__LOG("Found temperatures block: %s\n", tmp_node->name);
 					Reader__FillTemperatures (tmp_node, (XMLStruct *) values);
 					break;
 				case UPTIME:
-					DBG__LOG("Found uptime block: %s\n", root->name);
+					DBG__LOG("Found uptime block: %s\n", tmp_node->name);
 					values->uptime = atoi((char *)xmlNodeGetContent(tmp_node));
 					break;
 				case IP_ADDRESS:
-					DBG__LOG("Found ip-address block: %s\n", root->name);
+					DBG__LOG("Found ip-address block: %s\n", tmp_node->name);
 					values->ip_address = (char *)xmlNodeGetContent(tmp_node);
 					break;
 				case UNDEFINED:
@@ -90,7 +93,7 @@ void Reader__FillXMLStruct(xmlNode *root, XMLStruct *values){
 			}
 		}
 		tmp_node = tmp_node->next;
-	}	
+	}
 }
 
 void Reader__FillTemperatures(xmlNode *node, XMLStruct *values){
@@ -119,6 +122,5 @@ int Reader__KeyFromString(char *key){
 			return act->val;
 		}
 	}
-
 	return UNDEFINED;
 }

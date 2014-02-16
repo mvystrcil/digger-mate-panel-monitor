@@ -18,6 +18,8 @@
  */
 #ifndef LOGGER_H
 #define LOGGER_H
+#define TRUE 1
+#define FALSE 0
 
 #define DBG__LOG(fmt, ...) \
 	fprintf(stdout, "[%s:%d]:%s: " fmt,\

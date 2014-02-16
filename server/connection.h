@@ -17,5 +17,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#define ESCAPE_SIZE 2
+
 void Connection__Connect(void *conn_data);
 
