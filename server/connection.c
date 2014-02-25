@@ -29,13 +29,11 @@
 #include <sys/ioctl.h>
 
 #include "logger.h"
-#include "reader.h"
 #include "connection.h"
 #include "main.h"
 
 void Connection__HandleConnections(struct sockaddr_in server_data, int server_fd);
 void* Connection__ConnectionHandler(void *client_fd);
-void Connection__DumpData();
 void Connection__SendInteger(int socket, int integer);
 void Connection__SendString(int socket, char *string);
 ConnectionData *data;
@@ -108,43 +106,23 @@ void Connection__HandleConnections(struct sockaddr_in server_data, int server_fd
 void* Connection__ConnectionHandler(void *client_fd){
 	DBG__LOG("Client accepted\n");
 	int socket = *(int *)client_fd;
+	char buffer[256];
 
-	if(*(data->valid_data)){
-		DBG__LOG("Send server data to client\n");
-		Connection__DumpData();
-		int i;
-		XMLStruct *xml_data = data->xml_data;
-		Connection__SendString(socket, "Temperatures: ");
-		for(i = 0; i < CARDS_MAX; i++){
-			if(xml_data->temperatures[i] != 0){
-				if(i > 0){
-					Connection__SendString(socket, ",");
-				}
-				Connection__SendInteger(socket, xml_data->temperatures[i]);
-			}
-		}
-		Connection__SendString(socket, "\nIP-address: ");
-		Connection__SendString(socket, xml_data->ip_address);
-		Connection__SendString(socket, "\nUptime: ");
-		Connection__SendInteger(socket, xml_data->uptime);
-		Connection__SendString(socket, "\n");
+	FILE *file = fopen(data->xml_file, "r");
+	if(file == NULL){
+		DBG__LOG("Cannot open file %s for read\n", data->xml_file);
+		exit(1);
 	}
-	
+
+	DBG__LOG("Dumping data\n");
+
+	int i = 0;
+	while(fread(buffer, sizeof(char), sizeof(buffer), file) != 0){
+		Connection__SendString(socket, buffer);
+	}
+
 	close(*(int *) client_fd);
 	return 0;
-}
-
-void Connection__DumpData(){
-	int i;
-	for(i = 0; i < CARDS_MAX; i++){
-		if(data->xml_data->temperatures[i] != 0){
-			DBG__LOG("Temperature: %d\n", data->xml_data->temperatures[i]);
-		}
-	}
-	
-	DBG__LOG("IP address: %s\n", data->xml_data->ip_address);
-	DBG__LOG("Uptime: %d\n", data->xml_data->uptime);
-	DBG__LOG("Valid data ?: %d\n", *(data->valid_data));
 }
 
 void Connection__SendString(int socket, char *string){

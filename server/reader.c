@@ -25,7 +25,6 @@
 
 #include "reader.h"
 #include "logger.h"
-#include "main.h"
 
 xmlNode* Reader__ParseXMLFile(const char *xmlFile);
 void Reader__FillXMLStruct(xmlNode *root, XMLStruct *values);

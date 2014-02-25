@@ -23,42 +23,37 @@
 
 #include "connection.h"
 #include "logger.h"
-#include "reader.h"
 #include "main.h"
 
 #define SERVER_ADDR "127.0.0.1"
 #define XML_FILE "../../xml/xml_file.xml"
 
-XMLStruct xml_data;
 int valid_data = 0;
 
 int main(int argc, char* argv[]){
-	pthread_t connection, reader;
-	bzero(&xml_data, sizeof(xml_data));
-	
 	ConnectionData connection_data;	
+	pthread_t connection, reader;
+	bzero(&connection_data, sizeof(connection_data));
+
+	FILE *xmlFile = fopen(argv[1], "r");
+
+	if(xmlFile == NULL){
+		DBG__LOG("Cannot open xml file %s for read\n", argv[1]);
+		return -1;
+	} else {
+		fclose(xmlFile);
+	}
+	
 	connection_data.ip_address = SERVER_ADDR;
 	connection_data.port = 2000;
-	connection_data.xml_data = &xml_data;
-	connection_data.valid_data = &valid_data;
+	connection_data.xml_file = argv[1];
 	
 	if(pthread_create(&connection, NULL, Connection__Connect, &connection_data) < 0){
 		DBG__LOG("Cannot create Connection Hypervisor thread\n");
 		return -1;
 	}
 
-	ReaderData reader_data;
-	reader_data.xml_file = XML_FILE;
-	reader_data.xml_data = &xml_data;
-	reader_data.valid_data = &valid_data;
-	
-	if(pthread_create(&reader, NULL, Reader__ReadFile, (void *) &reader_data) < 0){
-		DBG__LOG("Cannot create Reader thread\n");
-		return -1;
-	}
-
 	pthread_join(connection, NULL);
-	pthread_join(reader, NULL);
 	
 	return 0;
 }
