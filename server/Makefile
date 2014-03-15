@@ -3,8 +3,8 @@ CC = gcc
 CFLAGS = -g -Wall
 TARGET = digger-server
 
-HEADERS = logger.h connection.h
-OBJECTS = connection.o main.o
+HEADERS = logger.h connection.h generator.h
+OBJECTS = connection.o main.o generator.o
 
 all: $(TARGET)
 

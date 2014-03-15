@@ -1,7 +1,7 @@
 /*
- * main.h
+ * generator.h
  *
- * Copyright (C) 2014 - Martin Vystrčil
+ * Copyright (C) 2014 - 
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,13 +17,4 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-typedef struct {
-	char *ip_address; /*don't need it any more'*/
-	int port;
-	char *xml_file;
-} ConnectionData;
-
-typedef struct {
-	char *xml_file;
-	char *path_to_scripts;
-} GeneratorData;
+void Generator__Init(void *generator_data);

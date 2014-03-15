@@ -17,6 +17,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 #ifndef LOGGER_H
+#include <stdio.h>
 #define LOGGER_H
 #define TRUE 1
 #define FALSE 0
@@ -24,5 +25,9 @@
 #define DBG__LOG(fmt, ...) \
 	fprintf(stdout, "[%s:%d]:%s: " fmt,\
 	__FILE__,__LINE__,__FUNCTION__,##__VA_ARGS__)
+
+#define DBG__ERR_LOG(fmt, ...) \
+	fprintf(stderr, "[%s:%d]:%s: " fmt,\
+	__FILE__,__LINE__,__FUNCTION__,##__VA_ARGS__)\
 
 #endif
