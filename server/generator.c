@@ -29,31 +29,56 @@
 #include "main.h"
 #include "logger.h"
 
-GeneratorData *data;
+#define START_TAG "<xml>\n"
+#define CLOSE_TAG "</xml>\n"
+
+GeneratorData generator_data;
 void Generator__DumpData(GeneratorData *data);
-void Generator__RunScripts(char *path);
+void Generator__RunScripts(const char *path);
 void Generator__RunFile(char *file, struct stat *st);
 
-void Generator__Init(void *generator_data){
+void* Generator__Init(void *gen_data){
 	DBG__LOG("Initializing logs\n");
-	data = (GeneratorData*) generator_data;
+	generator_data = *((GeneratorData*) gen_data);
 
-	Generator__DumpData(data);
-	Generator__RunScripts(data->path_to_scripts);
+	const char *path = generator_data.path_to_scripts;
+	
+	Generator__DumpData(&generator_data);
+
+	while(1){
+		Generator__RunScripts(path);
+		DBG__LOG("Wait - next cycle\n");
+		sleep(10);
+	}
+	return (void *)1;
 }
 
 void Generator__DumpData(GeneratorData *data){
-	DBG__LOG("XML file: %s\n", data->xml_file);
-	DBG__LOG("Scripts: %s\n", data->path_to_scripts);
+	DBG__LOG("XML file: %p, %s\n", data, data->xml_file);
+	DBG__LOG("Scripts: %p, %s\n", data, data->path_to_scripts);
 }
 
-void Generator__RunScripts(char *path){
+void Generator__RunScripts(const char *path){
 	DIR *curr_dir;
 	struct dirent *dir;
 	struct stat st;
 	curr_dir = opendir(path);
 	char path_buffer[1024];
+
+	DBG__LOG("RunScripts\n");
 	
+	Generator__DumpData(&generator_data);
+	
+	/* Init output xml file */
+	FILE *xml = fopen(generator_data.xml_file, "w");
+	if(!xml){
+		DBG__ERR_LOG("Cannot open output xml file %s\n", generator_data.xml_file);
+		return;
+	}
+	fprintf (xml, START_TAG);
+	fclose (xml);
+
+	/* Get all scripts from folder and run them */
 	if (curr_dir){
 		while ((dir = readdir(curr_dir)) != NULL){
 			/* Filter current dir */
@@ -70,6 +95,14 @@ void Generator__RunScripts(char *path){
 		}
 		closedir(curr_dir);
 	}
+	
+	/* Valid close output xml file */
+	xml = fopen(generator_data.xml_file, "a");
+	if(!xml){
+		DBG__ERR_LOG("Cannot open output xml file %s\n", path);
+	}
+	fprintf(xml, CLOSE_TAG);
+	fclose (xml);
 }
 
 void Generator__RunFile(char *file, struct stat *st){
@@ -80,19 +113,12 @@ void Generator__RunFile(char *file, struct stat *st){
 		DBG__LOG("Execute script with arguments %s\n", file);
 		pid = fork();
 		if(pid == 0){
-			execl(file, file, data->xml_file, (char*) NULL);
+			execl(file, file, generator_data.xml_file, (char*) NULL);
 			DBG__LOG("Done\n");
+		} else if (pid < 0){
+			DBG__ERR_LOG("Cannont fork process\n");
 		} else {
-			wait(&ret);
+			waitpid(pid, &ret, 0);
 		}
 	}
 }
-
-
-
-
-
-
-
-
-

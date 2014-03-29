@@ -34,23 +34,24 @@ void Connection__HandleConnections(struct sockaddr_in server_data, int server_fd
 void* Connection__ConnectionHandler(void *client_fd);
 void Connection__SendInteger(int socket, int integer);
 void Connection__SendString(int socket, char *string);
-ConnectionData *data;
+ConnectionData connection_data;
+char file[1024];
 
-void Connection__Connect(void *conn_data){
-	data = (ConnectionData *) conn_data;
-	char *address = data->ip_address;
-	int port = data->port;
+void* Connection__Connect(void *conn_data){
+	connection_data = *((ConnectionData *) conn_data);
+	int port = connection_data.port;
 	int server_fd, res;
-	struct sockaddr_in server_data;
+	DBG__LOG("Port: %d\n", port);
+	DBG__LOG("PORT: %p, %d\n", &connection_data.port, connection_data.port);
 	
+	struct sockaddr_in server_data;
 	server_fd = socket(AF_INET, SOCK_STREAM, 0);
 	if(server_fd < 0){
 		DBG__LOG("Cannot get file descriptor for Internet Socket\n");
-		return;
+		return (void *)1;
 	} else {
 		DBG__LOG("Got sockect fd: %d\n", server_fd);
 	}
-
 	int optval = 1;
 	setsockopt(server_fd, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(int));
 
@@ -62,19 +63,18 @@ void Connection__Connect(void *conn_data){
 
 	res = bind(server_fd, (struct sockaddr *) &server_data, sizeof(server_data));
 	listen(server_fd, 5);
-	
 	/* Handle connections in threads */
 	
 	if(res < 0){
-		DBG__LOG("Cannot bind to socket fd: %d, addr: %s, port: %d\n", server_fd, address, port);
-		return;
+		DBG__LOG("Cannot bind to socket fd: %d, port: %d\n", server_fd, port);
+		return (void *)1;
 	} else {
-		DBG__LOG("Socket binded to addr:\n");
+		DBG__LOG("Socket binded to port: %d\n", port);
 	}
 
 	Connection__HandleConnections (server_data, server_fd);
 
-	return;
+	return (void *)1;
 }
 
 void Connection__HandleConnections(struct sockaddr_in server_data, int server_fd){
@@ -83,6 +83,8 @@ void Connection__HandleConnections(struct sockaddr_in server_data, int server_fd
 	struct sockaddr_in client_data;
 	socklen_t tmp = sizeof(server_data);
 
+	DBG__LOG("Dump data %p, %s\n", &connection_data, connection_data.xml_file);
+	
 	while(1){
 		client_fd = accept(server_fd, (struct sockaddr *)&client_data, &tmp);
 		if(client_fd < 0){
@@ -104,17 +106,16 @@ void Connection__HandleConnections(struct sockaddr_in server_data, int server_fd
 void* Connection__ConnectionHandler(void *client_fd){
 	DBG__LOG("Client accepted\n");
 	int socket = *(int *)client_fd;
-	char buffer[256];
+	char buffer[BUFF_SIZE];
 
-	FILE *file = fopen(data->xml_file, "r");
+	FILE *file = fopen(connection_data.xml_file, "r");
 	if(file == NULL){
-		DBG__LOG("Cannot open file %s for read\n", data->xml_file);
+		DBG__LOG("Cannot open file %s for read\n", connection_data.xml_file);
 		exit(1);
 	}
 
-	DBG__LOG("Dumping data\n");
-
-	int i = 0;
+	DBG__LOG("Dump data %p, %s\n", &connection_data, connection_data.xml_file);
+	
 	while(fread(buffer, sizeof(char), sizeof(buffer), file) != 0){
 		Connection__SendString(socket, buffer);
 	}

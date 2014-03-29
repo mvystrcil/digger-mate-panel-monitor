@@ -18,6 +18,7 @@
  */
 
 #define ESCAPE_SIZE 2
+#define BUFF_SIZE 1024
 
-void Connection__Connect(void *conn_data);
+void* Connection__Connect(void *conn_data);
 

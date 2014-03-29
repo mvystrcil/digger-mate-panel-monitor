@@ -1,6 +1,6 @@
 LIBS = $(shell pkg-config --libs libxml-2.0) -lpthread
 CC = gcc
-CFLAGS = -g -Wall
+CFLAGS = -g -Wall -Werror
 TARGET = digger-server
 
 HEADERS = logger.h connection.h generator.h

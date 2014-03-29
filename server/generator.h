@@ -17,4 +17,4 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-void Generator__Init(void *generator_data);
+void* Generator__Init(void *generator_data);

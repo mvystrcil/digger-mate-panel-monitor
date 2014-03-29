@@ -18,12 +18,13 @@
  */
 
 typedef struct {
-	char *ip_address; /*don't need it any more'*/
 	int port;
-	char *xml_file;
+	char xml_file[256];
+	int *stop;
 } ConnectionData;
 
 typedef struct {
-	char *xml_file;
-	char *path_to_scripts;
+	char xml_file[256];
+	char path_to_scripts[256];
+	int *stop;
 } GeneratorData;
