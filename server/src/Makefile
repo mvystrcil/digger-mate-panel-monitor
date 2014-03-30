@@ -2,17 +2,21 @@ LIBS = $(shell pkg-config --libs libxml-2.0) -lpthread
 CC = gcc
 CFLAGS = -g -Wall -Werror
 TARGET = digger-server
+OBJDIR = ../build
 
 HEADERS = logger.h connection.h generator.h
-OBJECTS = connection.o main.o generator.o
+OBJECTS = $(OBJDIR)/connection.o $(OBJDIR)/main.o $(OBJDIR)/generator.o
 
-all: $(TARGET)
+all: $(OBJDIR) $(OBJDIR)/$(TARGET)
 
-%.o: %.c $(HEADERS)
+$(OBJDIR)/%.o: %.c $(HEADERS)
 	$(CC) $(CFLAGS) -c $< -o $@
 
-$(TARGET): $(OBJECTS)
+$(OBJDIR)/$(TARGET): $(OBJECTS)
 	$(CC) $(OBJECTS) -Wall $(LIBS) -o $@
+
+$(OBJDIR):
+	mkdir -p $@
 
 clean:
 	rm -f *.o
