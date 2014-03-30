@@ -19,6 +19,4 @@ $(OBJDIR):
 	mkdir -p $@
 
 clean:
-	rm -f *.o
-	rm -f $(TARGET)
-	rm -f *~
+	rm -rf $(OBJDIR)

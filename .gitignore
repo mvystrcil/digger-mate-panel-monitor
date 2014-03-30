@@ -48,3 +48,6 @@ server/autom4te.cache
 server/autom4te.cache/*
 server/Debug
 server/exclude/*
+
+*unstaged*
+build
