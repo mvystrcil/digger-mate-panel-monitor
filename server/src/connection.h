@@ -17,8 +17,18 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifndef CONNECTION_H
+#define CONNECTION_H
+
 #define ESCAPE_SIZE 2
 #define BUFF_SIZE 1024
 
+typedef struct {
+	int port;
+	char xml_file[256];
+	int *stop;
+} ConnectionData;
+
 void* Connection__Connect(void *conn_data);
 
+#endif

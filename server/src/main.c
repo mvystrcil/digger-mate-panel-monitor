@@ -25,7 +25,6 @@
 #include "connection.h"
 #include "logger.h"
 #include "generator.h"
-#include "main.h"
 
 #define DEFAULT_PORT 2000
 
@@ -45,8 +44,8 @@ GeneratorData generator_data;
 
 int main(int argc, char* argv[]){	
 	pthread_t connection, generate;
-	bzero(&connection_data, sizeof(connection_data));
-	bzero(&generator_data, sizeof(generator_data));
+	memset(&connection_data, 0, sizeof(connection_data));
+	memset(&generator_data, 0, sizeof(generator_data));
 	stop = 0;
 	
 	if(argc < 2){

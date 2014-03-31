@@ -17,4 +17,15 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifndef GENERATOR_H
+#define GENERATOR_H
+
+typedef struct {
+	char xml_file[256];
+	char path_to_scripts[256];
+	int *stop;
+} GeneratorData;
+
 void* Generator__Init(void *generator_data);
+
+#endif

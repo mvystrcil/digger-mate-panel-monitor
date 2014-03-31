@@ -24,15 +24,12 @@
 #include <string.h>
 #include <pthread.h>
 #include <unistd.h>
-#include <sys/ioctl.h>
 
 #include "logger.h"
 #include "connection.h"
-#include "main.h"
 
 void Connection__HandleConnections(struct sockaddr_in server_data, int server_fd);
 void* Connection__ConnectionHandler(void *client_fd);
-void Connection__SendInteger(int socket, int integer);
 void Connection__SendString(int socket, char *string);
 ConnectionData connection_data;
 char file[1024];
@@ -74,7 +71,7 @@ void* Connection__Connect(void *conn_data){
 
 	Connection__HandleConnections (server_data, server_fd);
 
-	return (void *)1;
+	return (void *)0;
 }
 
 void Connection__HandleConnections(struct sockaddr_in server_data, int server_fd){
@@ -125,11 +122,10 @@ void* Connection__ConnectionHandler(void *client_fd){
 }
 
 void Connection__SendString(int socket, char *string){
-	write(socket, string, strlen(string));
-}
+	int len;
+	len = write(socket, string, strlen(string));
 
-void Connection__SendInteger(int socket, int integer){
-	char buffer[256];
-	sprintf(buffer, "%d", integer);
-	write(socket, buffer, strlen(buffer)+1);
+	if(len != strlen(string)){
+		DBG__ERR_LOG("Cannot sent all data\n");
+	}
 }

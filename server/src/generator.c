@@ -26,7 +26,6 @@
 #include <stdlib.h>
 
 #include "generator.h"
-#include "main.h"
 #include "logger.h"
 
 #define START_TAG "<xml>\n"

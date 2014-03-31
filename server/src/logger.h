@@ -17,8 +17,9 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 #ifndef LOGGER_H
-#include <stdio.h>
 #define LOGGER_H
+
+#include <stdio.h>
 #define TRUE 1
 #define FALSE 0
 
