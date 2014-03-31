@@ -1,22 +1,30 @@
-LIBS = $(shell pkg-config --libs libxml-2.0) -lpthread
-CC = gcc
-CFLAGS = -g -Wall -Werror
+LIBS = -lpthread
 TARGET = digger-server
-OBJDIR = ../build
 
 HEADERS = logger.h connection.h generator.h
 OBJECTS = $(OBJDIR)/connection.o $(OBJDIR)/main.o $(OBJDIR)/generator.o
+SCRIPT_DIR = scripts
 
-all: $(OBJDIR) $(OBJDIR)/$(TARGET)
+.PHONY: $(OBJDIR) staging clean
+
+all: $(OBJDIR) $(BINDIR)/$(TARGET) staging
 
 $(OBJDIR)/%.o: %.c $(HEADERS)
 	$(CC) $(CFLAGS) -c $< -o $@
 
-$(OBJDIR)/$(TARGET): $(OBJECTS)
+$(BINDIR)/$(TARGET): $(OBJECTS) $(BINDIR)
 	$(CC) $(OBJECTS) -Wall $(LIBS) -o $@
 
 $(OBJDIR):
 	mkdir -p $@
 
+$(BINDIR):
+	mkdir -p $(BINDIR)
+
+staging:
+	mkdir -p $(BINDIR)/$(SCRIPT_DIR)
+	cp -r ../$(SCRIPT_DIR)/* $(BINDIR)/$(SCRIPT_DIR)/.
+
 clean:
 	rm -rf $(OBJDIR)
+	rm -f *~

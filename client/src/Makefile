@@ -1,20 +1,26 @@
 LIBS = $(shell pkg-config --libs libxml-2.0) -lpthread
-CC = gcc
-CFLAGS = -g -Wall
 TARGET = digger-client
 
-HEADERS = reader.h logger.h connection.h
-OBJECTS = reader.o connection.o main.o
+HEADERS = logger.h connection.h
+OBJECTS = $(OBJDIR)/connection.o $(OBJDIR)/main.o
+SCRIPT_DIR = scripts
 
-all: $(TARGET)
+.PHONY: $(OBJDIR) clean
 
-%.o: %.c $(HEADERS)
+all: $(OBJDIR) $(BINDIR)/$(TARGET)
+
+$(OBJDIR)/%.o: %.c $(HEADERS)
 	$(CC) $(CFLAGS) -c $< -o $@
 
-$(TARGET): $(OBJECTS)
+$(BINDIR)/$(TARGET): $(OBJECTS) $(BINDIR)
 	$(CC) $(OBJECTS) -Wall $(LIBS) -o $@
 
+$(OBJDIR):
+	mkdir -p $@
+
+$(BINDIR):
+	mkdir -p $(BINDIR)
+
 clean:
-	rm -f *.o
-	rm -f $(TARGET)
+	rm -rf $(OBJDIR)
 	rm -f *~

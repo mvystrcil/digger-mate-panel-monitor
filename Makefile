@@ -15,9 +15,11 @@ all: server client
 
 server:
 	cd server; make
+	@echo "===> Server Done"
 
 client:
 	cd client; make
+	@echo "===> Client Done"
 
 clean:
 	cd server; make clean
