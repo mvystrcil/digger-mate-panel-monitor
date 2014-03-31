@@ -17,7 +17,16 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifndef CONNECTION_H
+#define CONNECTION_H
+
 #define ESCAPE_SIZE 2
 
-void Connection__Connect(void *conn_data);
+typedef struct {
+	 int port;
+	 char address[256];
+} ConnectionData;
 
+void *Connection__Connect(void *conn_data);
+
+#endif
