@@ -1,8 +1,8 @@
 LIBS = $(shell pkg-config --libs libxml-2.0) -lpthread
 TARGET = digger-client
 
-HEADERS = logger.h connection.h
-OBJECTS = $(OBJDIR)/connection.o $(OBJDIR)/main.o
+HEADERS = logger.h connection.h parser.h
+OBJECTS = $(OBJDIR)/connection.o $(OBJDIR)/main.o $(OBJDIR)/parser.o
 SCRIPT_DIR = scripts
 
 .PHONY: $(OBJDIR) clean
