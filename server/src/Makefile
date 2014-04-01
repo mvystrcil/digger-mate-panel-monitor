@@ -13,7 +13,7 @@ $(OBJDIR)/%.o: %.c $(HEADERS)
 	$(CC) $(CFLAGS) -c $< -o $@
 
 $(BINDIR)/$(TARGET): $(OBJECTS) $(BINDIR)
-	$(CC) $(OBJECTS) -Wall $(LIBS) -o $@
+	$(CC) $(OBJECTS) $(LIBS) -o $@
 
 $(OBJDIR):
 	mkdir -p $@
