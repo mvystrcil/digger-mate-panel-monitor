@@ -21,12 +21,16 @@
 #define CONNECTION_H
 
 #define ESCAPE_SIZE 2
+#define ATTEMPTS 5
 
 typedef struct {
 	 int port;
+	 int refresh;
+	 int retry;
 	 char address[256];
+	 char file[256];
+	 int error;
 } ConnectionData;
 
 void *Connection__Connect(void *conn_data);
-
 #endif

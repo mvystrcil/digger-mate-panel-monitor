@@ -31,50 +31,82 @@
 #include "logger.h"
 #include "connection.h"
 
+void Connection__SaveServerData(int sockfd, char *file);
+void Connection__DumpData(ConnectionData *connection_data);
+
 void *Connection__Connect(void *conn_data){
-	int sockfd = 0, n = 0;
-    char recvBuff[1024];
+	int sockfd = 0;
+	int attempts = ATTEMPTS;
 	ConnectionData connection_data = *((ConnectionData *)conn_data);
 
 	struct sockaddr_in serv_addr;
-	memset(recvBuff, 0, sizeof(recvBuff));
-	memset(&serv_addr, 0, sizeof(serv_addr));
+	Connection__DumpData(&connection_data);
 	
-	if((sockfd = socket(AF_INET, SOCK_STREAM, 0)) < 0){
-        DBG__ERR_LOG("Cannot get socket fd\n");
-        return (void *) 1;
-    }
-
-	DBG__LOG("####### Connect to #######");
-	DBG__LOG("Port %d", connection_data.port);
-	DBG__LOG("Addr: %s", connection_data.address);
-	DBG__LOG("File desc: %d", sockfd);
-	DBG__LOG("#########################\n");
+	while(TRUE){
+		memset(&serv_addr, 0, sizeof(serv_addr));
 	
-	serv_addr.sin_family = AF_INET;
-    serv_addr.sin_port = htons(connection_data.port);
-
-	if(inet_pton(AF_INET, connection_data.address, &serv_addr.sin_addr)<=0){
-		DBG__ERR_LOG("Cannot set server address: %s\n", connection_data.address);
-		return (void *) 1;
-    }
-
-	if(connect(sockfd, (struct sockaddr *)&serv_addr, sizeof(serv_addr)) < 0){
-		DBG__ERR_LOG("Cannot connect to server: %s\n, errno %d", connection_data.address, errno);
-		return (void *) 1;
-    }
-
-	while ( (n = read(sockfd, recvBuff, sizeof(recvBuff)-1)) > 0){
-        recvBuff[n] = 0;
-        if(fputs(recvBuff, stdout) == EOF)
-        {
-            printf("\n Error : Fputs error\n");
-        }
-    }
-
-	if(n < 0){
-		DBG__ERR_LOG("Read error\n");
-    }
+		if((sockfd = socket(AF_INET, SOCK_STREAM, 0)) < 0){
+    		DBG__ERR_LOG("Cannot get socket fd\n");
+    		return NULL;
+		}
 	
-	return (void *) 0;
+		serv_addr.sin_family = AF_INET;
+		serv_addr.sin_port = htons(connection_data.port);
+
+		if(inet_pton(AF_INET, connection_data.address, &serv_addr.sin_addr)<=0){
+			DBG__ERR_LOG("Cannot set server address: %s\n", connection_data.address);
+			return NULL;
+		}
+
+		while(connect(sockfd, (struct sockaddr *)&serv_addr, sizeof(serv_addr)) < 0){
+			sleep(connection_data.retry);
+			attempts--;
+			if(attempts <= 0){
+				DBG__ERR_LOG("Cannot connect to server: %s, errno %d\n", connection_data.address, errno);
+				((ConnectionData *) conn_data)->error = errno;
+				return NULL;
+			}
+		}
+
+		Connection__SaveServerData(sockfd, connection_data.file);
+		sleep(connection_data.refresh);
+	}
+	
+	return NULL;
 }
+
+void Connection__DumpData(ConnectionData *connection_data){
+	DBG__LOG("####### Connect to #######");
+	DBG__LOG("Port %d", connection_data->port);
+	DBG__LOG("Addr: %s", connection_data->address);
+	DBG__LOG("Refresh: %d", connection_data->refresh);
+	DBG__LOG("Retry: %d", connection_data->retry);
+	DBG__LOG("File: %s", connection_data->file);
+	DBG__LOG("Error: %d", connection_data->error);
+	DBG__LOG("#########################\n");
+}
+
+void Connection__SaveServerData(int sockfd, char *file){
+	char recvBuff[1024];
+	int recv_size=0;
+
+	FILE *local_file = fopen(file, "w");
+	if(!file){
+		DBG__ERR_LOG("Cannot open local file: %s\n", file);
+		return;
+	}
+
+	DBG__LOG("Save to file: %s\n", file);
+	
+	memset(recvBuff, 0, sizeof(recvBuff));
+	
+	while((recv_size = read(sockfd, recvBuff, sizeof(recvBuff))) > 0){
+		fprintf(local_file, "%s", recvBuff);
+	}
+
+	fclose(local_file);
+}
+
+
+
+
