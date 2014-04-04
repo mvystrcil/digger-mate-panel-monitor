@@ -25,31 +25,64 @@
 
 #define NUM_FUNCTIONS 4
 
-void Parser__GetIPAddress(int x, int y){
-	DBG__ERR_LOG("Unimplemented %d, %d", x, y);
+void Parser__GetIPAddress(char *filename){
 }
 
-void Parser__GetTemperatures(int x, int y){
-	DBG__ERR_LOG("Unimplemented %d, %d", x, y);
+void Parser__GetTemperatures(char *filename){
 }
 
-void Parser__GetCardLoad(int x, int y){
-	DBG__ERR_LOG("Unimplemented %d, %d", x, y);
+void Parser__GetCardLoad(char *filename){
 }
 
-void Parser__GetUptime(int x, int y){
-	DBG__ERR_LOG("Unimplemented %d, %d", x, y);
+void Parser__GetUptime(char *filename){
 }
 
-void *Parser__ParseXMLFile(void *xml_file){
-	LIBXML_TEST_VERSION
-	
-	void (*functions[NUM_FUNCTIONS]) (int x, int y) = {
+static void
+print_element_names(xmlNode *a_node)
+{
+    xmlNode *cur_node = NULL;
+
+    for (cur_node = a_node; cur_node; cur_node = cur_node->next) {
+        if (cur_node->type == XML_ELEMENT_NODE) {
+            printf("node type: Element, name: %s\n", cur_node->name);
+        }
+
+        print_element_names(cur_node->children);
+    }
+}
+
+void *Parser__ParseXMLFile(void *xml_file){	
+	char *filename = (char *)xml_file;
+	void (*functions[NUM_FUNCTIONS]) (char *filename) = {
 		Parser__GetIPAddress,
 		Parser__GetTemperatures,
 		Parser__GetCardLoad,
 		Parser__GetUptime
 	};
+
+	LIBXML_TEST_VERSION
+
+	xmlDoc *doc = NULL;
+    xmlNode *root_element = NULL;
+	doc = xmlReadFile(xml_file, NULL, 0);
+
+    if (doc == NULL) {
+        DBG__ERR_LOG("Cannot read xml file %s\n", filename);
+    }
+
+    root_element = xmlDocGetRootElement(doc);
+    print_element_names(root_element);
+
+    /*free the document */
+    xmlFreeDoc(doc);
+
+    /*
+     *Free the global variables that may
+     *have been allocated by the parser.
+     */
+    xmlCleanupParser();
+
+    return 0;
 
 	int i;
 	char *file_to_parse = ((char *)xml_file);
@@ -57,12 +90,11 @@ void *Parser__ParseXMLFile(void *xml_file){
 	DBG__LOG("%s\n", file_to_parse);
 	
 	for(i = 0; i < NUM_FUNCTIONS; i++){
-		functions[i](1,5);
+		functions[i](filename);
 	}
 	
 	return NULL;
 }
-
 
 
 
