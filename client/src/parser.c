@@ -19,22 +19,51 @@
 
 #include <libxml/parser.h>
 #include <libxml/tree.h>
+#include <unistd.h>
 
 #include "logger.h"
 #include "parser.h"
 
 #define NUM_FUNCTIONS 4
 
-void Parser__GetIPAddress(char *filename){
+void Parser__GetIPAddress(xmlNode *root_element, char *filename){
+	xmlNode *cur_node = NULL;
+
+    for (cur_node = root_element; cur_node; cur_node = cur_node->next) {
+        if (cur_node->type == XML_ELEMENT_NODE) {
+            printf("node type: Element, name: %s\n", cur_node->name);
+        }
+    }
 }
 
-void Parser__GetTemperatures(char *filename){
+void Parser__GetTemperatures(xmlNode *root_element, char *filename){
+	xmlNode *cur_node = NULL;
+
+    for (cur_node = root_element; cur_node; cur_node = cur_node->next) {
+        if (cur_node->type == XML_ELEMENT_NODE) {
+            printf("node type: Element, name: %s\n", cur_node->name);
+        }
+    }
 }
 
-void Parser__GetCardLoad(char *filename){
+void Parser__GetCardLoad(xmlNode *root_element, char *filename){
+	xmlNode *cur_node = NULL;
+
+    for (cur_node = root_element; cur_node; cur_node = cur_node->next) {
+        if (cur_node->type == XML_ELEMENT_NODE) {
+            printf("node type: Element, name: %s\n", cur_node->name);
+        }
+    }
 }
 
-void Parser__GetUptime(char *filename){
+void Parser__GetUptime(xmlNode *root_element, char *filename){
+	xmlNode *cur_node = NULL;
+
+    for (cur_node = root_element; cur_node; cur_node = cur_node->next) {
+        if (cur_node->type == XML_ELEMENT_NODE) {
+            printf("node type: Element, name: %s\n", cur_node->name);
+        }
+    }
 }
 
 static void
@@ -53,18 +82,19 @@ print_element_names(xmlNode *a_node)
 
 void *Parser__ParseXMLFile(void *xml_file){	
 	char *filename = (char *)xml_file;
-	void (*functions[NUM_FUNCTIONS]) (char *filename) = {
+	void (*functions[NUM_FUNCTIONS]) (xmlNode *root_element, char *filename) = {
 		Parser__GetIPAddress,
 		Parser__GetTemperatures,
 		Parser__GetCardLoad,
 		Parser__GetUptime
 	};
 
+	sleep(10);
 	LIBXML_TEST_VERSION
 
 	xmlDoc *doc = NULL;
     xmlNode *root_element = NULL;
-	doc = xmlReadFile(xml_file, NULL, 0);
+	doc = xmlReadFile(filename, NULL, 0);
 
     if (doc == NULL) {
         DBG__ERR_LOG("Cannot read xml file %s\n", filename);
@@ -73,25 +103,23 @@ void *Parser__ParseXMLFile(void *xml_file){
     root_element = xmlDocGetRootElement(doc);
     print_element_names(root_element);
 
-    /*free the document */
-    xmlFreeDoc(doc);
-
-    /*
-     *Free the global variables that may
-     *have been allocated by the parser.
-     */
-    xmlCleanupParser();
-
-    return 0;
-
 	int i;
 	char *file_to_parse = ((char *)xml_file);
 
 	DBG__LOG("%s\n", file_to_parse);
 	
 	for(i = 0; i < NUM_FUNCTIONS; i++){
-		functions[i](filename);
+		functions[i](root_element, filename);
 	}
+
+	/*free the document */
+    xmlFreeDoc(doc);
+
+	/*
+     *Free the global variables that may
+     *have been allocated by the parser.
+     */
+    xmlCleanupParser();
 	
 	return NULL;
 }

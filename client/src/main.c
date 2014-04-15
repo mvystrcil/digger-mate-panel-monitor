@@ -37,7 +37,7 @@ int main(int argc, char* argv[]){
 	memset(&parser_in_data, 0, sizeof(parser_in_data));
 
 	conn_data.port = 2000;
-	conn_data.refresh = 5;
+	conn_data.refresh = 15;
 	conn_data.retry = 1;
 	strcpy(conn_data.address, "127.0.0.1");
 	strcpy(conn_data.file, "local.xml");
