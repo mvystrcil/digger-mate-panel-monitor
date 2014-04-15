@@ -25,12 +25,16 @@
 #define FALSE 0
 
 #define DBG__LOG(fmt, ...) \
+	do { \
 	fprintf(stdout, "[%s:%d]:%s: " fmt "\n",\
-	__FILE__,__LINE__,__FUNCTION__,##__VA_ARGS__)
+	__FILE__,__LINE__,__FUNCTION__,##__VA_ARGS__); \
+	} while(0)
 
 #define DBG__ERR_LOG(fmt, ...) \
+	do { \
 	fprintf(stdout, "[%s:%d]:%s: " fmt "\n",\
-	__FILE__,__LINE__,__FUNCTION__,##__VA_ARGS__)
+	__FILE__,__LINE__,__FUNCTION__,##__VA_ARGS__); \
+	} while(0)
 
 
 #endif

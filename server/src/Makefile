@@ -1,9 +1,11 @@
 LIBS = -lpthread
 TARGET = digger-server
 
-HEADERS = logger.h connection.h generator.h
+HEADERS = connection.h generator.h
 OBJECTS = $(OBJDIR)/connection.o $(OBJDIR)/main.o $(OBJDIR)/generator.o
 SCRIPT_DIR = scripts
+
+CFLAGS += -I../../common/src
 
 .PHONY: $(OBJDIR) staging clean
 
