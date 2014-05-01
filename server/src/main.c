@@ -25,6 +25,7 @@
 #include "connection.h"
 #include "logger.h"
 #include "generator.h"
+#include "mutex.h"
 
 #define DEFAULT_PORT 2000
 
@@ -62,6 +63,8 @@ int main(int argc, char* argv[]){
 
 	Main__DumpConnectionData(&connection_data);
 	Main__DumpGeneratorData(&generator_data);
+
+	Mutex__Init();
 	
 	if(pthread_create(&generate, NULL, Generator__Init, (void *)&generator_data) < 0){
 		DBG__LOG("Cannot create Generator Hypervisor thread\n");

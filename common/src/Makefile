@@ -1,25 +1,17 @@
 LIBS = -lpthread
-TARGET = digger-server
 
-HEADERS = connection.h generator.h
-OBJECTS = $(OBJDIR)/connection.o \
-	$(OBJDIR)/main.o \
-	$(OBJDIR)/generator.o
-
-EXTOBJECTS = ../../common/build/mutex.o
-SCRIPT_DIR = scripts
-
-CFLAGS += -I../../common/src
+HEADERS = mutex.h
+OBJECTS = $(OBJDIR)/mutex.o
 
 .PHONY: $(OBJDIR) staging clean
 
-all: $(OBJDIR) $(BINDIR)/$(TARGET) staging
+all: $(OBJDIR) $(OBJECTS)
 
 $(OBJDIR)/%.o: %.c $(HEADERS)
 	$(CC) $(CFLAGS) -c $< -o $@
 
 $(BINDIR)/$(TARGET): $(OBJECTS) $(BINDIR)
-	$(CC) $(OBJECTS) $(EXTOBJECTS) $(LIBS) -o $@
+	$(CC) $(OBJECTS) $(LIBS) -o $@
 
 $(OBJDIR):
 	mkdir -p $@

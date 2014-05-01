@@ -3,6 +3,7 @@ TARGET = digger-client
 
 HEADERS = connection.h parser.h
 OBJECTS = $(OBJDIR)/connection.o $(OBJDIR)/main.o $(OBJDIR)/parser.o
+EXTOBJECTS = ../../common/build/mutex.o
 SCRIPT_DIR = scripts
 
 CFLAGS +=-I../../common/src/
@@ -15,7 +16,7 @@ $(OBJDIR)/%.o: %.c $(HEADERS)
 	$(CC) $(CFLAGS) -c $< -o $@
 
 $(BINDIR)/$(TARGET): $(OBJECTS) $(BINDIR)
-	$(CC) $(OBJECTS) $(LIBS) -o $@
+	$(CC) $(OBJECTS) $(EXTOBJECTS) $(LIBS) -o $@
 
 $(OBJDIR):
 	mkdir -p $@

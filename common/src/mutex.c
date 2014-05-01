@@ -1,5 +1,5 @@
 /*
- * parser.h
+ * mutex.c
  *
  * Copyright (C) 2014 - Martin Vystrčil
  *
@@ -17,21 +17,31 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef PARSER_H
-#define PARSER_H
+#include <pthread.h>
 
 #include "mutex.h"
+#include "logger.h"
 
-typedef struct{
-	 char ip_address[16];
-	 int uptime;
-	 char uptime_unit[3];
-} ParserData;
+pthread_mutex_t xml_file_mutex = PTHREAD_MUTEX_INITIALIZER;
 
-typedef struct{
-	char xml_file[256];
-} ParserInputData;
+int Mutex__Init(){
+	if(pthread_mutex_init(&xml_file_mutex, NULL) != 0){
+		DBG__ERR_LOG("Cannot initialize connection mutex\n");
+		return FALSE;
+	}
+	return TRUE;
+}
 
-void *Parser__ParseXMLFile(void *xml_file);
+int Mutex__LockFileMutex(){
+	pthread_mutex_lock(&xml_file_mutex);
+	return TRUE;
+}
 
-#endif
+int Mutex__UnlockFileMutex(){
+	pthread_mutex_unlock(&xml_file_mutex);
+	return TRUE;
+}
+
+void Mutex__DestroyAll(){
+	pthread_mutex_destroy(&xml_file_mutex);
+}

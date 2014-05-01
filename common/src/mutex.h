@@ -1,5 +1,5 @@
 /*
- * parser.h
+ * mutex.h
  *
  * Copyright (C) 2014 - Martin Vystrčil
  *
@@ -17,21 +17,13 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef PARSER_H
-#define PARSER_H
+#ifndef MUTEX_H
+#define MUTEX_H
 
-#include "mutex.h"
+int Mutex__Init();
+int Mutex__LockFileMutex();
+int Mutex__UnlockFileMutex();
 
-typedef struct{
-	 char ip_address[16];
-	 int uptime;
-	 char uptime_unit[3];
-} ParserData;
-
-typedef struct{
-	char xml_file[256];
-} ParserInputData;
-
-void *Parser__ParseXMLFile(void *xml_file);
+void Mutex__DestroyAll();
 
 #endif

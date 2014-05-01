@@ -25,6 +25,7 @@
 #include "connection.h"
 #include "logger.h"
 #include "parser.h"
+#include "mutex.h"
 
 int valid_data = 0;
 
@@ -45,6 +46,8 @@ int main(int argc, char* argv[]){
 	strcpy(parser_in_data.xml_file, "local.xml");
 	
 	DBG__LOG("Addr: %p\n", &conn_data.error);
+
+	Mutex__Init();
 
 	if(pthread_create(&connection, NULL, Connection__Connect, (void *)&conn_data) < 0){
 		DBG__ERR_LOG("Cannot create Connection thread\n");

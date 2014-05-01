@@ -90,6 +90,8 @@ void Connection__SaveServerData(int sockfd, char *file){
 	char recvBuff[1024];
 	int recv_size=0;
 
+	DBG__LOG("XML file mutex lock\n");
+	Mutex__LockFileMutex();
 	FILE *local_file = fopen(file, "w");
 	if(!file){
 		DBG__ERR_LOG("Cannot open local file: %s\n", file);
@@ -105,6 +107,7 @@ void Connection__SaveServerData(int sockfd, char *file){
 	}
 
 	fclose(local_file);
+	Mutex__UnlockFileMutex();
 }
 
 

@@ -27,6 +27,7 @@
 
 #include "generator.h"
 #include "logger.h"
+#include "mutex.h"
 
 #define START_TAG "<xml>\n"
 #define CLOSE_TAG "</xml>\n"
@@ -67,6 +68,8 @@ void Generator__RunScripts(const char *path){
 	DBG__LOG("RunScripts\n");
 	
 	Generator__DumpData(&generator_data);
+
+	Mutex__LockFileMutex();
 	
 	/* Init output xml file */
 	FILE *xml = fopen(generator_data.xml_file, "w");
@@ -102,6 +105,8 @@ void Generator__RunScripts(const char *path){
 	}
 	fprintf(xml, CLOSE_TAG);
 	fclose (xml);
+	
+	Mutex__UnlockFileMutex();
 }
 
 void Generator__RunFile(char *file, struct stat *st){

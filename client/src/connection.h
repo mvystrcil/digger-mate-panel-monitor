@@ -20,6 +20,8 @@
 #ifndef CONNECTION_H
 #define CONNECTION_H
 
+#include "mutex.h"
+
 #define ESCAPE_SIZE 2
 #define ATTEMPTS 5
 

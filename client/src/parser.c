@@ -89,11 +89,13 @@ void *Parser__ParseXMLFile(void *xml_file){
 		Parser__GetUptime
 	};
 
-	sleep(10);
+	sleep(5);
 	LIBXML_TEST_VERSION
 
 	xmlDoc *doc = NULL;
     xmlNode *root_element = NULL;
+
+	Mutex__LockFileMutex();
 	doc = xmlReadFile(filename, NULL, 0);
 
     if (doc == NULL) {
@@ -120,6 +122,7 @@ void *Parser__ParseXMLFile(void *xml_file){
      *have been allocated by the parser.
      */
     xmlCleanupParser();
+	Mutex__UnlockFileMutex();
 	
 	return NULL;
 }

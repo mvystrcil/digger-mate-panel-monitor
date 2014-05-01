@@ -27,6 +27,7 @@
 
 #include "logger.h"
 #include "connection.h"
+#include "mutex.h"
 
 void Connection__HandleConnections(struct sockaddr_in server_data, int server_fd);
 void* Connection__ConnectionHandler(void *client_fd);
@@ -105,6 +106,8 @@ void* Connection__ConnectionHandler(void *client_fd){
 	int socket = *(int *)client_fd;
 	char buffer[BUFF_SIZE];
 
+	Mutex__LockFileMutex();
+
 	FILE *file = fopen(connection_data.xml_file, "r");
 	if(file == NULL){
 		DBG__LOG("Cannot open file %s for read\n", connection_data.xml_file);
@@ -117,6 +120,10 @@ void* Connection__ConnectionHandler(void *client_fd){
 		Connection__SendString(socket, buffer);
 	}
 
+	fclose(file);
+
+	Mutex__UnlockFileMutex();
+	
 	close(*(int *) client_fd);
 	return 0;
 }
